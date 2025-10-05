@@ -70,25 +70,16 @@ function ReceiptForm() {
       alert("Please enter Mobile Number.");
       return;
     }
-    // Format message content
-    const message = 
-`*Receipt Details*%0A
-*Customer Name:* ${customerName}%0A
-*Date of Transaction:* ${date}%0A
-*Amount:* ₹${amount}%0A
-*Mobile Number:* ${mobileNumber}%0A
-*Remarks:* ${remarks || "N/A"}
-`;
-
     // Sanitize mobile number (remove spaces and dashes)
     const sanitizedNumber = mobileNumber.replace(/\D/g, "");
-    
+
     // WhatsApp requires country code without +
     const waNumber = sanitizedNumber.startsWith("91")
       ? sanitizedNumber
-      : "91" + sanitizedNumber; // Assuming India, modify if needed
-    
-    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+      : "91" + sanitizedNumber; 
+
+    //  %0A for new lines
+    const url = `https://wa.me/${waNumber}?text=*Receipt Details*%0A*Customer Name:* ${encodeURIComponent(customerName)}%0A*Date of Transaction:* ${encodeURIComponent(date)}%0A*Amount:* ₹${encodeURIComponent(amount)}%0A*Mobile Number:* ${encodeURIComponent(mobileNumber)}%0A*Remarks:* ${encodeURIComponent(remarks || "N/A")}`;
     window.open(url, "_blank");
   };
 
