@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { CSVLink } from "react-csv";
 import customers from '../assets/customers.json';
 
 
@@ -17,7 +18,18 @@ function ReceiptForm() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [remarks, setRemarks] = useState("");
 
+  const [csvData, setCsvData] = useState([]);
+
   const suggestionsRef = useRef();
+  const csvLinkRef = useRef();
+
+  const headers = [
+    { label: "Customer Name", key: "customerName" },
+    { label: "Date", key: "date" },
+    { label: "Amount", key: "amount" },
+    { label: "Mobile Number", key: "mobileNumber" },
+    { label: "Remarks", key: "remarks" }
+  ];
 
   useEffect(() => {
     // Close suggestions if clicked outside suggestions box
@@ -70,13 +82,18 @@ function ReceiptForm() {
       alert("Please enter Mobile Number.");
       return;
     }
+
+    // Prepare CSV data
+    setCsvData([{ customerName, date, amount, mobileNumber, remarks }]);
+    setTimeout(() => csvLinkRef.current.link.click(), 0);
+
     // Sanitize mobile number (remove spaces and dashes)
     const sanitizedNumber = mobileNumber.replace(/\D/g, "");
 
     // WhatsApp requires country code without +
     const waNumber = sanitizedNumber.startsWith("91")
       ? sanitizedNumber
-      : "91" + sanitizedNumber; 
+      : "91" + sanitizedNumber;
 
     //  %0A for new lines
     const url = `https://wa.me/${waNumber}?text=*Receipt Details*%0A*Customer Name:* ${encodeURIComponent(customerName)}%0A*Date of Transaction:* ${encodeURIComponent(date)}%0A*Amount:* ₹${encodeURIComponent(amount)}%0A*Mobile Number:* ${encodeURIComponent(mobileNumber)}%0A*Remarks:* ${encodeURIComponent(remarks || "N/A")}`;
@@ -270,6 +287,7 @@ function ReceiptForm() {
             </button>
           </div>
         </form>
+        <CSVLink ref={csvLinkRef} headers={headers} data={csvData} filename="receipt.csv" style={{ display: 'none' }} />
       </div>
     </div>
   );
